@@ -1,9 +1,8 @@
-#ifndef ESP32_BLE_GAMEPAD_H
-#define ESP32_BLE_GAMEPAD_H
-#include "sdkconfig.h"
-#if defined(CONFIG_BT_ENABLED)
+#ifndef BLE_GAMEPAD_H
+#define BLE_GAMEPAD_H
 
-#include "nimconfig.h"
+#include "BleGamepadPlatform.h"
+
 #if defined(CONFIG_BT_NIMBLE_ROLE_PERIPHERAL)
 
 #include "BleConnectionStatus.h"
@@ -42,10 +41,11 @@ private:
     NimBLECharacteristic *inputGamepad;
 
     void rawAction(uint8_t msg[], char msgSize);
-    static void taskServer(void *pvParameter);
     uint8_t specialButtonBitPosition(uint8_t specialButton);
 
 public:
+    static void taskServer(void *pvParameter);
+
     BleGamepad(std::string deviceName = "ESP32 BLE Gamepad", std::string deviceManufacturer = "Espressif", uint8_t batteryLevel = 100);
     void begin(BleGamepadConfiguration *config = new BleGamepadConfiguration());
     void end(void);
@@ -111,5 +111,4 @@ protected:
 };
 
 #endif // CONFIG_BT_NIMBLE_ROLE_PERIPHERAL
-#endif // CONFIG_BT_ENABLED
-#endif // ESP32_BLE_GAMEPAD_H
+#endif // BLE_GAMEPAD_H

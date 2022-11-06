@@ -1,3 +1,5 @@
+Adapted from https://github.com/lemmingDev/ESP32-BLE-Gamepad
+
 ## POSSIBLE BREAKING CHANGES - PLEASE READ
 A large code rebase (configuration class) along with some extra features (start, select, menu, home, back, volume up, volume down and volume mute buttons) has been committed thanks to @dexterdy
 
@@ -33,7 +35,7 @@ It would be great however if any improvements are fed back into this version.
  - [x] Special buttons (start, select, menu, home, back, volume up, volume down, volume mute) all disabled by default
  - [x] Configurable HID descriptor
  - [x] Configurable VID and PID values
- - [x] Configurable BLE characteristics (name, manufacturer, model number, software revision, serial number, firmware revision, hardware revision)	
+ - [x] Configurable BLE characteristics (name, manufacturer, model number, software revision, serial number, firmware revision, hardware revision)
  - [x] Report optional battery level to host
  - [x] Uses efficient NimBLE bluetooth library
  - [x] Compatible with Windows
@@ -133,7 +135,7 @@ Credits to [chegewara](https://github.com/chegewara) as the ESP32-BLE-Mouse libr
 Credits to [wakwak-koba](https://github.com/wakwak-koba) for the NimBLE [code](https://github.com/wakwak-koba/ESP32-NimBLE-Gamepad) that he provided.
 
 ## Notes
-This library allows you to make the ESP32 act as a Bluetooth Gamepad and control what it does.  
+This library allows you to make the ESP32 act as a Bluetooth Gamepad and control what it does.
 Relies on [NimBLE-Arduino](https://github.com/h2zero/NimBLE-Arduino)
 
 Use [this](http://www.planetpointy.co.uk/joystick-test-application/) Windows test app to test/see all of the buttons

@@ -4,13 +4,17 @@
 #include "NimBLEHIDDevice.h"
 #include "HIDTypes.h"
 #include "HIDKeyboardTypes.h"
+
+#ifdef ESP_PLATFORM
 #include <driver/adc.h>
 #include "sdkconfig.h"
+#endif
 
 #include "BleConnectionStatus.h"
 #include "BleGamepad.h"
 #include "BleGamepadConfiguration.h"
 
+#ifdef ESP_PLATFORM
 #if defined(CONFIG_ARDUHAL_ESP_LOG)
 #include "esp32-hal-log.h"
 #define LOG_TAG "BLEGamepad"
@@ -18,15 +22,15 @@
 #include "esp_log.h"
 static const char *LOG_TAG = "BLEGamepad";
 #endif
+#endif
 
-#define SERVICE_UUID_DEVICE_INFORMATION        "180A"      // Service - Device information
+#define SERVICE_UUID_DEVICE_INFORMATION "180A" // Service - Device information
 
-#define CHARACTERISTIC_UUID_MODEL_NUMBER       "2A24"      // Characteristic - Model Number String - 0x2A24
-#define CHARACTERISTIC_UUID_SOFTWARE_REVISION  "2A28"      // Characteristic - Software Revision String - 0x2A28
-#define CHARACTERISTIC_UUID_SERIAL_NUMBER      "2A25"      // Characteristic - Serial Number String - 0x2A25
-#define CHARACTERISTIC_UUID_FIRMWARE_REVISION  "2A26"      // Characteristic - Firmware Revision String - 0x2A26
-#define CHARACTERISTIC_UUID_HARDWARE_REVISION  "2A27"      // Characteristic - Hardware Revision String - 0x2A27
-
+#define CHARACTERISTIC_UUID_MODEL_NUMBER "2A24"      // Characteristic - Model Number String - 0x2A24
+#define CHARACTERISTIC_UUID_SOFTWARE_REVISION "2A28" // Characteristic - Software Revision String - 0x2A28
+#define CHARACTERISTIC_UUID_SERIAL_NUMBER "2A25"     // Characteristic - Serial Number String - 0x2A25
+#define CHARACTERISTIC_UUID_FIRMWARE_REVISION "2A26" // Characteristic - Firmware Revision String - 0x2A26
+#define CHARACTERISTIC_UUID_HARDWARE_REVISION "2A27" // Characteristic - Hardware Revision String - 0x2A27
 
 uint8_t tempHidReportDescriptor[150];
 int hidReportDescriptorSize = 0;
@@ -87,18 +91,18 @@ void BleGamepad::begin(BleGamepadConfiguration *config)
     firmwareRevision = configuration.getFirmwareRevision();
     hardwareRevision = configuration.getHardwareRevision();
 
-	vid = configuration.getVid();
-	pid = configuration.getPid();
+    vid = configuration.getVid();
+    pid = configuration.getPid();
 
-	uint8_t high = highByte(vid);
-	uint8_t low = lowByte(vid);
+    uint8_t high = highByte(vid);
+    uint8_t low = lowByte(vid);
 
-	vid = low << 8 | high;
+    vid = low << 8 | high;
 
-	high = highByte(pid);
-	low = lowByte(pid);
+    high = highByte(pid);
+    low = lowByte(pid);
 
-	pid = low << 8 | high;
+    pid = low << 8 | high;
 
     uint8_t buttonPaddingBits = 8 - (configuration.getButtonCount() % 8);
     if (buttonPaddingBits == 8)
@@ -263,7 +267,7 @@ void BleGamepad::begin(BleGamepadConfiguration *config)
                 // USAGE (Home)
                 tempHidReportDescriptor[hidReportDescriptorSize++] = 0x0A;
                 tempHidReportDescriptor[hidReportDescriptorSize++] = 0x23;
-		            tempHidReportDescriptor[hidReportDescriptorSize++] = 0x02;
+                tempHidReportDescriptor[hidReportDescriptorSize++] = 0x02;
             }
 
             if (configuration.getIncludeBack())
@@ -271,7 +275,7 @@ void BleGamepad::begin(BleGamepadConfiguration *config)
                 // USAGE (Back)
                 tempHidReportDescriptor[hidReportDescriptorSize++] = 0x0A;
                 tempHidReportDescriptor[hidReportDescriptorSize++] = 0x24;
-	        	    tempHidReportDescriptor[hidReportDescriptorSize++] = 0x02;
+                tempHidReportDescriptor[hidReportDescriptorSize++] = 0x02;
             }
 
             if (configuration.getIncludeVolumeInc())
@@ -333,19 +337,19 @@ void BleGamepad::begin(BleGamepadConfiguration *config)
         tempHidReportDescriptor[hidReportDescriptorSize++] = 0x16;
         tempHidReportDescriptor[hidReportDescriptorSize++] = lowByte(configuration.getAxesMin());
         tempHidReportDescriptor[hidReportDescriptorSize++] = highByte(configuration.getAxesMin());
-        //tempHidReportDescriptor[hidReportDescriptorSize++] = 0x00;		// Use these two lines for 0 min
-        //tempHidReportDescriptor[hidReportDescriptorSize++] = 0x00;
-		    //tempHidReportDescriptor[hidReportDescriptorSize++] = 0x01;	// Use these two lines for -32767 min
-        //tempHidReportDescriptor[hidReportDescriptorSize++] = 0x80;
+        // tempHidReportDescriptor[hidReportDescriptorSize++] = 0x00;		// Use these two lines for 0 min
+        // tempHidReportDescriptor[hidReportDescriptorSize++] = 0x00;
+        // tempHidReportDescriptor[hidReportDescriptorSize++] = 0x01;	// Use these two lines for -32767 min
+        // tempHidReportDescriptor[hidReportDescriptorSize++] = 0x80;
 
         // LOGICAL_MAXIMUM (+32767)
         tempHidReportDescriptor[hidReportDescriptorSize++] = 0x26;
         tempHidReportDescriptor[hidReportDescriptorSize++] = lowByte(configuration.getAxesMax());
         tempHidReportDescriptor[hidReportDescriptorSize++] = highByte(configuration.getAxesMax());
-        //tempHidReportDescriptor[hidReportDescriptorSize++] = 0xFF;	// Use these two lines for 255 max
-        //tempHidReportDescriptor[hidReportDescriptorSize++] = 0x00;
-		    //tempHidReportDescriptor[hidReportDescriptorSize++] = 0xFF;	// Use these two lines for +32767 max
-        //tempHidReportDescriptor[hidReportDescriptorSize++] = 0x7F;
+        // tempHidReportDescriptor[hidReportDescriptorSize++] = 0xFF;	// Use these two lines for 255 max
+        // tempHidReportDescriptor[hidReportDescriptorSize++] = 0x00;
+        // tempHidReportDescriptor[hidReportDescriptorSize++] = 0xFF;	// Use these two lines for +32767 max
+        // tempHidReportDescriptor[hidReportDescriptorSize++] = 0x7F;
 
         // REPORT_SIZE (16)
         tempHidReportDescriptor[hidReportDescriptorSize++] = 0x75;
@@ -435,19 +439,19 @@ void BleGamepad::begin(BleGamepadConfiguration *config)
         tempHidReportDescriptor[hidReportDescriptorSize++] = 0x16;
         tempHidReportDescriptor[hidReportDescriptorSize++] = lowByte(configuration.getSimulationMin());
         tempHidReportDescriptor[hidReportDescriptorSize++] = highByte(configuration.getSimulationMin());
-        //tempHidReportDescriptor[hidReportDescriptorSize++] = 0x00;		// Use these two lines for 0 min
-        //tempHidReportDescriptor[hidReportDescriptorSize++] = 0x00;
-		//tempHidReportDescriptor[hidReportDescriptorSize++] = 0x01;	    // Use these two lines for -32767 min
-        //tempHidReportDescriptor[hidReportDescriptorSize++] = 0x80;
+        // tempHidReportDescriptor[hidReportDescriptorSize++] = 0x00;		// Use these two lines for 0 min
+        // tempHidReportDescriptor[hidReportDescriptorSize++] = 0x00;
+        // tempHidReportDescriptor[hidReportDescriptorSize++] = 0x01;	    // Use these two lines for -32767 min
+        // tempHidReportDescriptor[hidReportDescriptorSize++] = 0x80;
 
         // LOGICAL_MAXIMUM (+32767)
         tempHidReportDescriptor[hidReportDescriptorSize++] = 0x26;
         tempHidReportDescriptor[hidReportDescriptorSize++] = lowByte(configuration.getSimulationMax());
         tempHidReportDescriptor[hidReportDescriptorSize++] = highByte(configuration.getSimulationMax());
-        //tempHidReportDescriptor[hidReportDescriptorSize++] = 0xFF;	    // Use these two lines for 255 max
-        //tempHidReportDescriptor[hidReportDescriptorSize++] = 0x00;
-		//tempHidReportDescriptor[hidReportDescriptorSize++] = 0xFF;		// Use these two lines for +32767 max
-        //tempHidReportDescriptor[hidReportDescriptorSize++] = 0x7F;
+        // tempHidReportDescriptor[hidReportDescriptorSize++] = 0xFF;	    // Use these two lines for 255 max
+        // tempHidReportDescriptor[hidReportDescriptorSize++] = 0x00;
+        // tempHidReportDescriptor[hidReportDescriptorSize++] = 0xFF;		// Use these two lines for +32767 max
+        // tempHidReportDescriptor[hidReportDescriptorSize++] = 0x7F;
 
         // REPORT_SIZE (16)
         tempHidReportDescriptor[hidReportDescriptorSize++] = 0x75;
@@ -563,7 +567,7 @@ void BleGamepad::begin(BleGamepadConfiguration *config)
     // END_COLLECTION (Application)
     tempHidReportDescriptor[hidReportDescriptorSize++] = 0xc0;
 
-    xTaskCreate(this->taskServer, "server", 20000, (void *)this, 5, NULL);
+    // xTaskCreate(this->taskServer, "server", 20000, (void *)this, 5, NULL);
 }
 
 void BleGamepad::end(void)
@@ -834,8 +838,11 @@ void BleGamepad::release(uint8_t b)
 
 uint8_t BleGamepad::specialButtonBitPosition(uint8_t b)
 {
+#ifdef ESP_PLATFORM
     if (b >= POSSIBLESPECIALBUTTONS)
         throw std::invalid_argument("Index out of range");
+#endif
+
     uint8_t bit = 0;
     for (int i = 0; i < b; i++)
     {
@@ -1340,7 +1347,7 @@ void BleGamepad::setBatteryLevel(uint8_t level)
         {
             this->hid->batteryLevel()->notify();
         }
-		
+
         if (configuration.getAutoReport())
         {
             sendReport();
@@ -1352,11 +1359,13 @@ void BleGamepad::taskServer(void *pvParameter)
 {
     BleGamepad *BleGamepadInstance = (BleGamepad *)pvParameter; // static_cast<BleGamepad *>(pvParameter);
 
+    Serial.println("Started BLE task server");
+
     // Use the procedure below to set a custom Bluetooth MAC address
     // Compiler adds 0x02 to the last value of board's base MAC address to get the BT MAC address, so take 0x02 away from the value you actually want when setting
-    //uint8_t newMACAddress[] = {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF - 0x02};
-    //esp_base_mac_addr_set(&newMACAddress[0]); // Set new MAC address 
-    
+    // uint8_t newMACAddress[] = {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF - 0x02};
+    // esp_base_mac_addr_set(&newMACAddress[0]); // Set new MAC address
+
     NimBLEDevice::init(BleGamepadInstance->deviceName);
     NimBLEServer *pServer = NimBLEDevice::createServer();
     pServer->setCallbacks(BleGamepadInstance->connectionStatus);
@@ -1369,35 +1378,30 @@ void BleGamepad::taskServer(void *pvParameter)
     BleGamepadInstance->hid->manufacturer()->setValue(BleGamepadInstance->deviceManufacturer);
 
     NimBLEService *pService = pServer->getServiceByUUID(SERVICE_UUID_DEVICE_INFORMATION);
-	
-	BLECharacteristic* pCharacteristic_Model_Number = pService->createCharacteristic(
-      CHARACTERISTIC_UUID_MODEL_NUMBER,
-      NIMBLE_PROPERTY::READ
-    );
+
+    BLECharacteristic *pCharacteristic_Model_Number = pService->createCharacteristic(
+        CHARACTERISTIC_UUID_MODEL_NUMBER,
+        NIMBLE_PROPERTY::READ);
     pCharacteristic_Model_Number->setValue(modelNumber);
-	
-	BLECharacteristic* pCharacteristic_Software_Revision = pService->createCharacteristic(
-      CHARACTERISTIC_UUID_SOFTWARE_REVISION,
-      NIMBLE_PROPERTY::READ
-    );
+
+    BLECharacteristic *pCharacteristic_Software_Revision = pService->createCharacteristic(
+        CHARACTERISTIC_UUID_SOFTWARE_REVISION,
+        NIMBLE_PROPERTY::READ);
     pCharacteristic_Software_Revision->setValue(softwareRevision);
-	
-	BLECharacteristic* pCharacteristic_Serial_Number = pService->createCharacteristic(
-      CHARACTERISTIC_UUID_SERIAL_NUMBER,
-      NIMBLE_PROPERTY::READ
-    );
+
+    BLECharacteristic *pCharacteristic_Serial_Number = pService->createCharacteristic(
+        CHARACTERISTIC_UUID_SERIAL_NUMBER,
+        NIMBLE_PROPERTY::READ);
     pCharacteristic_Serial_Number->setValue(serialNumber);
-	
-	BLECharacteristic* pCharacteristic_Firmware_Revision = pService->createCharacteristic(
-      CHARACTERISTIC_UUID_FIRMWARE_REVISION,
-      NIMBLE_PROPERTY::READ
-    );
+
+    BLECharacteristic *pCharacteristic_Firmware_Revision = pService->createCharacteristic(
+        CHARACTERISTIC_UUID_FIRMWARE_REVISION,
+        NIMBLE_PROPERTY::READ);
     pCharacteristic_Firmware_Revision->setValue(firmwareRevision);
-	
-	BLECharacteristic* pCharacteristic_Hardware_Revision = pService->createCharacteristic(
-      CHARACTERISTIC_UUID_HARDWARE_REVISION,
-      NIMBLE_PROPERTY::READ
-    );
+
+    BLECharacteristic *pCharacteristic_Hardware_Revision = pService->createCharacteristic(
+        CHARACTERISTIC_UUID_HARDWARE_REVISION,
+        NIMBLE_PROPERTY::READ);
     pCharacteristic_Hardware_Revision->setValue(hardwareRevision);
 
     BleGamepadInstance->hid->pnp(0x01, vid, pid, 0x0110);
@@ -1409,7 +1413,7 @@ void BleGamepad::taskServer(void *pvParameter)
     memcpy(customHidReportDescriptor, tempHidReportDescriptor, hidReportDescriptorSize);
 
     // Testing
-    //for (int i = 0; i < hidReportDescriptorSize; i++)
+    // for (int i = 0; i < hidReportDescriptorSize; i++)
     //    Serial.printf("%02x", customHidReportDescriptor[i]);
 
     BleGamepadInstance->hid->reportMap((uint8_t *)customHidReportDescriptor, hidReportDescriptorSize);
@@ -1423,6 +1427,8 @@ void BleGamepad::taskServer(void *pvParameter)
     pAdvertising->start();
     BleGamepadInstance->hid->setBatteryLevel(BleGamepadInstance->batteryLevel);
 
+#ifdef ESP_PLATFORM
     ESP_LOGD(LOG_TAG, "Advertising started!");
-    vTaskDelay(portMAX_DELAY); // delay(portMAX_DELAY);
+#endif
+    // vTaskDelay(portMAX_DELAY); // delay(portMAX_DELAY);
 }
